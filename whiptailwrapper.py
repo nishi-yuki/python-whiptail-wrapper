@@ -14,6 +14,17 @@ def yesno(text: str, height: int = 0, width: int = 0) -> bool:
     return not result.returncode
 
 
+def inputbox(text: str, height: int = 0, width: int = 0,
+             init_text: str = "", password: bool = False) -> Union[str, None]:
+    result = subprocess.run(
+        ["whiptail", "--inputbox", text, str(height), str(width), init_text],
+        stderr=subprocess.PIPE)
+    if result.returncode == 0:
+        return result.stderr.decode("UTF8")
+    else:
+        return None
+
+
 if __name__ == "__main__":
     msgbox("This is msgbox test")
 
@@ -22,3 +33,5 @@ if __name__ == "__main__":
         print("'ok' selected")
     else:
         print("'no' selected")
+
+    print(inputbox("This is inputbox test.\nThis will echo your text."))
