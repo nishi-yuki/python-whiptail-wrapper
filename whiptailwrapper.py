@@ -1,5 +1,5 @@
 import subprocess
-from typing import Union
+from typing import Any, Union, Tuple, Sequence
 
 
 def msgbox(text: str, height: int = 0, width: int = 0) -> None:
@@ -31,6 +31,25 @@ def passwordbox(text: str, height: int = 0, width: int = 0,
     return inputbox(text, height, width, init_text, password=True)
 
 
+def menu(text: str, items: Sequence[Tuple[Any, str]],
+         height: int = 0, width: int = 0,
+         list_height: int = 0, ) -> int:
+    flat_items = []
+    for i, item in enumerate(items):
+        flat_items.extend([str(i), item[1]])
+    args = [
+        "whiptail", "--notags", "--menu", str(text), str(height), str(width),
+        str(list_height)
+    ] + flat_items
+    result = subprocess.run(args, stderr=subprocess.PIPE)
+    output_str = result.stderr.decode("UTF8")
+    try:
+        idnum = int(output_str)
+    except:
+        raise Exception(output_str)
+    return idnum
+
+
 if __name__ == "__main__":
     msgbox("This is msgbox test")
 
@@ -43,3 +62,12 @@ if __name__ == "__main__":
     print(inputbox("This is inputbox test.\nThis will echo your text."))
 
     print(passwordbox("This is inputbox test.\nThis will echo your text."))
+
+    print(menu(
+        "This is menu test.",
+        [
+            ("spam", "SPAM! SPAM!"),
+            ("hoge", "hoge ho ge"),
+            ("world", "hello world"),
+        ]
+    ))
